@@ -56,6 +56,8 @@ h1{font-family:Jua,sans-serif;color:var(--navy);font-weight:400;margin:0;font-si
 #f2{font-size:1.05em;letter-spacing:.5em;color:#aaa;margin-top:1.1em;padding-left:.5em}
 #f3{font-size:1.2em;margin-top:4em;color:#cfcfcf}
 #f4{font-size:1.2em;margin-top:.9em;color:#cfcfcf}
+#ver{position:fixed;left:0;right:0;bottom:1.2em;text-align:center;font-size:.7em;color:#555;letter-spacing:.1em;font-family:monospace}
+#fsbtn{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);z-index:8;display:none;font-family:"Noto Sans KR",sans-serif;font-size:calc(var(--u)*.9);background:rgba(20,16,60,.7);color:#fffef0;border:.08em solid rgba(255,255,255,.55);border-radius:.7em;padding:.4em .9em}
 #veil{position:absolute;inset:0;z-index:9;background:#0d0c1f;opacity:0;pointer-events:none;transition:opacity 1s ease}
 #veil.on{opacity:1;pointer-events:auto}
 /* 터미널 */
@@ -67,10 +69,10 @@ h1{font-family:Jua,sans-serif;color:var(--navy);font-weight:400;margin:0;font-si
 #s-end .note{color:#8f8fb8;font-size:1em}
 /* 대기 화면 */
 #s-main{font-size:var(--u)}
-.logo{position:absolute;top:4%;right:3.5%;color:#fffef0;text-align:center;font-family:Jua,sans-serif;line-height:1.15;text-shadow:0 .08em 0 rgba(43,36,112,.5)}
+.logo{position:absolute;top:3%;right:2.5%;background:rgba(28,22,84,.72);padding:.45em .9em .5em;border-radius:.8em;color:#fffef0;text-align:center;font-family:Jua,sans-serif;line-height:1.15;text-shadow:0 .08em 0 rgba(43,36,112,.5)}
 .logo small{display:block;font-size:.95em;letter-spacing:.2em;border-bottom:.1em solid #fffef0;padding-bottom:.15em;margin-bottom:.2em}
 .logo b{font-weight:400;font-size:1.75em;display:block;border-bottom:.1em solid #fffef0;padding-bottom:.12em}
-.status{position:absolute;top:5%;left:4%;color:#fffef0;font-size:1.05em;display:flex;align-items:center;gap:.55em;font-weight:600}
+.status{position:absolute;top:4%;left:2.5%;background:rgba(28,22,84,.72);padding:.35em .8em;border-radius:.8em;color:#fffef0;font-size:1.05em;display:flex;align-items:center;gap:.55em;font-weight:600}
 .status i{width:.75em;height:.75em;border-radius:50%;background:#7dffb0;box-shadow:0 0 .6em #7dffb0;animation:bl 1.6s ease-in-out infinite;display:block}
 .status span.el{font-weight:400;opacity:.85;font-variant-numeric:tabular-nums}
 #s-main .win{width:58%;height:70%;margin-top:6%}
@@ -116,6 +118,7 @@ h1{font-family:Jua,sans-serif;color:var(--navy);font-weight:400;margin:0;font-si
           <li>준비가 완료되었다면<br>확인 버튼을 눌러 시작합니다.</li>
         </ol>
         <div class="row"><button class="btn small ghost" id="guidetest">소리 확인</button><button class="btn" id="guideok">확인</button></div>
+        <div id="ver">ver. 1117-B</div>
       </div></div>
   </section>
   <section class="screen" id="s-start"><div class="bg"></div>
@@ -144,6 +147,7 @@ h1{font-family:Jua,sans-serif;color:var(--navy);font-weight:400;margin:0;font-si
   <!-- 4. 종료 -->
   <section class="screen" id="s-end"><div class="term" id="endterm"></div><div class="note" id="endnote"></div></section>
   <section class="screen" id="s-fin"><div class="fin"><p id="f1">인류는 멸망했습니다</p><p id="f2">THE END</p><p id="f3">이제 엔딩북으로 돌아가 작품의 해설을 확인합니다.</p><p id="f4">수고하셨습니다.</p></div></section>
+  <button id="fsbtn">⛶ 전체 화면으로</button>
   <div id="veil"></div>
 </div>
 <script>
@@ -237,6 +241,11 @@ function goFull(then){ // 전체 화면(안드로이드). 아이폰은 지원하
   try{if(isFull()){if(then)then();return}var el=document.documentElement,rq=el.requestFullscreen||el.webkitRequestFullscreen;if(rq){var p=rq.call(el);if(p&&p.then)p.then(function(){if(then)then();layout()}).catch(function(){})}}catch(e){}
   wake()}
 function enterLand(){land=true;goFull(lockLand);wake();layout()}
+function canFull(){var el=document.documentElement;return !!(el.requestFullscreen||el.webkitRequestFullscreen)&&(document.fullscreenEnabled!==false)}
+function fsUpdate(){$("fsbtn").style.display=(land&&canFull()&&!isFull())?"block":"none"}
+$("fsbtn").addEventListener("click",function(){goFull(lockLand);setTimeout(fsUpdate,600)});
+document.addEventListener("fullscreenchange",function(){fsUpdate();layout()});document.addEventListener("webkitfullscreenchange",function(){fsUpdate();layout()});
+setInterval(fsUpdate,1500);
 var veil=$("veil");
 function through(ms,mid,out){ // 어둡게 → 화면 교체 → 천천히 밝게
   veil.style.transitionDuration=ms+"ms";veil.classList.add("on");
